@@ -16,6 +16,19 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true
-  }
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@api/*": ["src/api/*"],
+      "@config/*": ["src/config/*"],
+      "@core/*": ["src/core/*"],
+      "@shared/*": ["src/shared/*"],
+      "@domain/*": ["src/core/domain/*"],
+      "@entities/*": ["src/core/domain/entities/*"],
+      "@services/*": ["src/core/services/*"],
+      "@env/*": ["src/config/env/*"],
+      "@integrations/*": ["src/shared/integrations/*"]
+    }
+  },
+  "include": ["src/**/*", "__test__"],
+  "exclude": ["node_modules/**/*", ".vscode/**/*"]
 }

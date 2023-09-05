@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@nestjs/axios": "^3.0.0",
+    "@nestjs/config": "^3.0.1",
+    "@nestjs/microservices": "^10.2.4",
+    "@nestjs/platform-express": "^10.2.4",
+    "@nestjs/swagger": "^7.1.10",
+    "@nestjs/typeorm": "^10.0.0",
+    "nestjs-pino": "^3.4.0",
+    "pg": "^8.11.3",
+    "pino-http": "^8.4.0",
+    "swagger-ui-express": "^5.0.0",
+    "typeorm": "^0.3.17"
+  }
+}
