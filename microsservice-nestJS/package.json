@@ -1,0 +1,90 @@
+{
+  "name": "knowledge-backend",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Gabriel Santos",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "infra:up": "docker-compose up -d",
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "code:check": "eslint",
+    "code:format": "prettier --write",
+    "commit:check": "commitlint --edit \"$1\""
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.2.4",
+    "@nestjs/config": "^3.1.0",
+    "@nestjs/core": "^10.2.4",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/sequelize": "^10.0.0",
+    "@nestjs/swagger": "^7.1.11",
+    "kafkajs": "^2.2.4",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1",
+    "class-validator": "^0.14.0",
+    "pg": "^8.11.3",
+    "sequelize": "^6.33.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.22.15",
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "@compodoc/compodoc": "^1.1.21",
+    "@nestjs/cli": "^10.0.0",
+    "@nestjs/platform-express": "^10.2.5",
+    "@nestjs/schematics": "^10.0.0",
+    "@nestjs/testing": "^10.0.0",
+    "@types/sequelize": "^4.28.15",
+    "@types/uuid": "^9.0.3",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.3.1",
+    "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.0",
+    "source-map-support": "^0.5.21",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.0",
+    "ts-loader": "^9.4.3",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typeorm-extension": "^3.0.1",
+    "sqlite3": "^5.1.6",
+    "typescript": "^5.2.2"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write --single-quote true --trailing-comma all --print-width 120 --semi false",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint:staged",
+      "pre-push": "npm run build",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
