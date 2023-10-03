@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TestSetupService } from '../../../test/setupTests';
+import { TestSetupService } from '../../../tests/setupTests';
 import { ProductService } from '@services/product.service';
 import { ClientService } from '@services/client.service';
 import { PlanService } from '@services/plan.service';
