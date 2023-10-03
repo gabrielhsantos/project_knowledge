@@ -1,6 +1,5 @@
 import { ClientController } from '@app/controllers/client.controller';
-import { clientRequestToDto } from '@app/presenters/client.mapper';
-import { ClientBodyDto } from '@core/domain/dtos/client.dto';
+import { ClientDto } from '@core/domain/dtos/client.dto';
 import { Client } from '@core/infrastructure/entities/client.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClientService } from '@services/client.service';
@@ -10,13 +9,13 @@ const clientEntity: Partial<Client> = {
   uuid: '5e480b27-7083-4c4f-a460-4f2cf4a27e3a',
 };
 
-const body: ClientBodyDto = {
-  cpf: '45645645600',
-  nome: 'José da Silva',
+const body: ClientDto = {
+  document: '45645645600',
+  name: 'José da Silva',
   email: 'jose@cliente.com',
-  dataDeNascimento: new Date('2010-08-24T12:00:00.000Z'),
-  genero: 'Masculino',
-  rendaMensal: 2899.5,
+  dob: new Date('2010-08-24T12:00:00.000Z'),
+  gender: 'Masculino',
+  income: 2899.5,
 };
 
 describe('ClientController', () => {
@@ -50,9 +49,7 @@ describe('ClientController', () => {
     it('should create a client successfully', async () => {
       const result = await clientController.create(body);
 
-      expect(clientService.create).toHaveBeenCalledWith(
-        clientRequestToDto(body),
-      );
+      expect(clientService.create).toHaveBeenCalledWith(body);
       expect(clientService.create).toHaveBeenCalledTimes(1);
       expect(result).toEqual({ id: clientEntity.uuid });
     });
@@ -69,9 +66,7 @@ describe('ClientController', () => {
         .mockRejectedValue(new ConflictException(errorMessage));
 
       expect(clientController.create(body)).rejects.toThrowError(errorMessage);
-      expect(clientService.create).toHaveBeenCalledWith(
-        clientRequestToDto(body),
-      );
+      expect(clientService.create).toHaveBeenCalledWith(body);
       expect(clientService.create).toHaveBeenCalledTimes(1);
     });
   });

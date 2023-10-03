@@ -1,32 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ClientBodyDto {
+export class ClientDto {
+  id?: number;
+  uuid?: string;
+
   @ApiProperty({ example: '45645645600' })
-  cpf: string;
+  document: string;
 
   @ApiProperty({ example: 'José da Silva' })
-  nome: string;
+  name: string;
 
   @ApiProperty({ example: 'jose@cliente.com' })
   email: string;
 
   @ApiProperty({ example: '2010-08-24T12:00:00.000Z' })
-  dataDeNascimento: Date;
+  dob: Date;
 
   @ApiProperty({ example: 'Masculino' })
-  genero: string;
+  gender: string;
 
   @ApiProperty({ example: 2899.5 })
-  rendaMensal: number;
-}
-
-export class ClientDto {
-  uuid?: string;
-  document: string;
-  name: string;
-  email: string;
-  dob: Date;
-  gender: string;
   income: number;
 }
 

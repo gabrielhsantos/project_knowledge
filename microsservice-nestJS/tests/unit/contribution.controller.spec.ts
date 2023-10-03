@@ -1,6 +1,5 @@
 import { ContributionController } from '@app/controllers/contribution.controller';
-import { contributionRequestToDto } from '@app/presenters/contribution.mapper';
-import { ContributionBodyDto } from '@core/domain/dtos/contribution.dto';
+import { ContributionDto } from '@core/domain/dtos/contribution.dto';
 import { Client } from '@core/infrastructure/entities/client.entity';
 import { Contribution } from '@core/infrastructure/entities/contribution.entity';
 import { Plan } from '@core/infrastructure/entities/plan.entity';
@@ -29,10 +28,10 @@ const productEntity: Partial<Product> = {
   minimumValueExtraContribution: 100.0,
 };
 
-const body: ContributionBodyDto = {
-  idCliente: '18dfeb91-459a-4bc7-9cdd-d93b41f7bf62',
-  idPlano: '30f6b23f-c93d-4cf9-8916-bcdb9fac83df',
-  valorAporte: 50.0,
+const body: ContributionDto = {
+  clientId: '18dfeb91-459a-4bc7-9cdd-d93b41f7bf62',
+  planId: '30f6b23f-c93d-4cf9-8916-bcdb9fac83df',
+  contribution: 50.0,
 };
 
 describe('ContributionController', () => {
@@ -85,9 +84,7 @@ describe('ContributionController', () => {
     it('should create a contribution successfully', async () => {
       const result = await contributionController.create(body);
 
-      expect(contributionService.create).toHaveBeenCalledWith(
-        contributionRequestToDto(body),
-      );
+      expect(contributionService.create).toHaveBeenCalledWith(body);
       expect(contributionService.create).toHaveBeenCalledTimes(1);
       expect(result).toEqual({ id: contributionEntity.uuid });
     });
@@ -109,9 +106,7 @@ describe('ContributionController', () => {
       expect(contributionController.create(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
-      expect(contributionService.create).toHaveBeenCalledWith(
-        contributionRequestToDto(exceptionBody),
-      );
+      expect(contributionService.create).toHaveBeenCalledWith(exceptionBody);
     });
 
     it('should not create a contribution without a plan', async () => {
@@ -131,9 +126,7 @@ describe('ContributionController', () => {
       expect(contributionController.create(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
-      expect(contributionService.create).toHaveBeenCalledWith(
-        contributionRequestToDto(exceptionBody),
-      );
+      expect(contributionService.create).toHaveBeenCalledWith(exceptionBody);
     });
 
     it('should not create a contribution with a invalid min value', async () => {
@@ -150,9 +143,7 @@ describe('ContributionController', () => {
       expect(contributionController.create(body)).rejects.toThrowError(
         errorMessage,
       );
-      expect(contributionService.create).toHaveBeenCalledWith(
-        contributionRequestToDto(body),
-      );
+      expect(contributionService.create).toHaveBeenCalledWith(body);
     });
   });
 });

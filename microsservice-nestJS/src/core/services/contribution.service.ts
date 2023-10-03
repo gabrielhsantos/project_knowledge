@@ -19,12 +19,13 @@ export class ContributionService {
   ) {}
 
   async create(contribution: ContributionDto): Promise<Contribution> {
-    const { clientUuid, planUuid } = contribution;
+    const clientUuid = contribution.clientId as string;
+    const planUuid = contribution.planId as string;
 
-    const clientDb = await this.clientService.findOneClientByUuid(clientUuid!);
+    const clientDb = await this.clientService.findOneClientByUuid(clientUuid);
     if (!clientDb) throw new NotFoundException('Client not found.');
 
-    const planDb = await this.planService.findOnePlanByUuid(planUuid!);
+    const planDb = await this.planService.findOnePlanByUuid(planUuid);
     if (!planDb) throw new NotFoundException('Plan not found.');
 
     const { isValid, message } = await this.validateContribution(

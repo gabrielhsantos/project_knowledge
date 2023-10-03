@@ -28,7 +28,7 @@ describe('RedemptionController (e2e)', () => {
     const { planId } = await testSetupService.setupPlan();
 
     const newRedemption = {
-      idPlano: planId,
+      planId,
       valorResgate: 1000.0,
     };
 

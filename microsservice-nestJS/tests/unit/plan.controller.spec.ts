@@ -1,6 +1,5 @@
 import { PlanController } from '@app/controllers/plan.controller';
-import { planRequestToDto } from '@app/presenters/plan.mapper';
-import { PlanBodyDto } from '@core/domain/dtos/plan.dto';
+import { PlanDto } from '@core/domain/dtos/plan.dto';
 import { Client } from '@core/infrastructure/entities/client.entity';
 import { Plan } from '@core/infrastructure/entities/plan.entity';
 import { Product } from '@core/infrastructure/entities/product.entity';
@@ -23,12 +22,12 @@ const productEntity: Partial<Product> = {
   uuid: '30f6b23f-c93d-4cf9-8916-bcdb9fac83df',
 };
 
-const body: PlanBodyDto = {
-  idCliente: '18dfeb91-459a-4bc7-9cdd-d93b41f7bf62',
-  idProduto: '30f6b23f-c93d-4cf9-8916-bcdb9fac83df',
-  aporte: 2000.0,
-  dataDaContratacao: new Date('2022-04-05T12:00:00.000Z'),
-  idadeDeAposentadoria: 60,
+const body: PlanDto = {
+  clientId: '18dfeb91-459a-4bc7-9cdd-d93b41f7bf62',
+  productId: '30f6b23f-c93d-4cf9-8916-bcdb9fac83df',
+  contribution: 2000.0,
+  subscriptionDate: new Date('2022-04-05T12:00:00.000Z'),
+  retirementAge: 60,
 };
 
 describe('PlanController', () => {
@@ -79,7 +78,7 @@ describe('PlanController', () => {
     it('should create a plan successfully', async () => {
       const result = await planController.create(body);
 
-      expect(planService.create).toHaveBeenCalledWith(planRequestToDto(body));
+      expect(planService.create).toHaveBeenCalledWith(body);
       expect(planService.create).toHaveBeenCalledTimes(1);
       expect(result).toEqual({ id: planEntity.uuid });
     });
@@ -101,9 +100,7 @@ describe('PlanController', () => {
       expect(planController.create(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
-      expect(planService.create).toHaveBeenCalledWith(
-        planRequestToDto(exceptionBody),
-      );
+      expect(planService.create).toHaveBeenCalledWith(exceptionBody);
     });
 
     it('should not create a plan without a product', async () => {
@@ -125,9 +122,7 @@ describe('PlanController', () => {
       expect(planController.create(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
-      expect(planService.create).toHaveBeenCalledWith(
-        planRequestToDto(exceptionBody),
-      );
+      expect(planService.create).toHaveBeenCalledWith(exceptionBody);
     });
 
     it('should not create a plan with invalid date of birth', async () => {
@@ -143,7 +138,7 @@ describe('PlanController', () => {
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
       expect(planController.create(body)).rejects.toThrowError(errorMessage);
-      expect(planService.create).toHaveBeenCalledWith(planRequestToDto(body));
+      expect(planService.create).toHaveBeenCalledWith(body);
     });
 
     it('should not create a plan with a expired date', async () => {
@@ -159,7 +154,7 @@ describe('PlanController', () => {
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
       expect(planController.create(body)).rejects.toThrowError(errorMessage);
-      expect(planService.create).toHaveBeenCalledWith(planRequestToDto(body));
+      expect(planService.create).toHaveBeenCalledWith(body);
     });
 
     it('should not create a plan with a invalid contribution value', async () => {
@@ -175,7 +170,7 @@ describe('PlanController', () => {
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
       expect(planController.create(body)).rejects.toThrowError(errorMessage);
-      expect(planService.create).toHaveBeenCalledWith(planRequestToDto(body));
+      expect(planService.create).toHaveBeenCalledWith(body);
     });
   });
 });

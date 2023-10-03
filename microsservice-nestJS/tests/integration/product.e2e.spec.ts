@@ -21,15 +21,15 @@ describe('ProductController (e2e)', () => {
 
   it('/POST /products', async () => {
     const newProduct = {
-      nome: 'Brasilprev Longo Prazo',
+      name: 'Brasilprev Longo Prazo',
       susep: '15414900840201817',
-      expiracaoDeVenda: '2026-01-01T12:00:00.000Z',
-      valorMinimoAporteInicial: 1000.0,
-      valorMinimoAporteExtra: 100.0,
-      idadeDeEntrada: 18,
-      idadeDeSaida: 60,
-      carenciaInicialDeResgate: 60,
-      carenciaEntreResgates: 30,
+      saleExpiration: '2026-01-01T12:00:00.000Z',
+      minimumInitialContributionValue: 1000.0,
+      minimumValueExtraContribution: 100.0,
+      entryAge: 18,
+      exitAge: 60,
+      initialRescueGracePeriod: 60,
+      rescueBetweenGracePeriods: 30,
     };
 
     const response = await request(app.getHttpServer())

@@ -1,11 +1,14 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RedemptionService } from '@core/services/redemption.service';
-import { RedemptionBodyDto } from '@core/domain/dtos/redemption.dto';
 import {
-  redemptionRequestToDto,
-  redemptionResponse,
-} from '@app/presenters/redemption.mapper';
+  RedemptionDto,
+  RedemptionResponseDto,
+} from '@core/domain/dtos/redemption.dto';
+import { redemptionResponse } from '@app/presenters/redemption.mapper';
+import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
+import { NotFoundException } from '@shared/exceptions/not-found.exception';
+import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
 
 @ApiTags('redemptions')
 @Controller('redemptions')
@@ -18,10 +21,27 @@ export class RedemptionController {
     status: 201,
     description: 'Redemption created',
   })
-  async create(@Body() redemptionBodyDto: RedemptionBodyDto): Promise<any> {
-    const request = redemptionRequestToDto(redemptionBodyDto);
-    const newRedemption = await this.redemptionService.create(request);
+  async create(
+    @Body() redemptionDto: RedemptionDto,
+  ): Promise<
+    | RedemptionResponseDto
+    | UnprocessableEntityException
+    | NotFoundException
+    | InternalServerErrorException
+  > {
+    try {
+      const newRedemption = await this.redemptionService.create(redemptionDto);
 
-    return redemptionResponse(newRedemption);
+      return redemptionResponse(newRedemption);
+    } catch (error) {
+      switch (error.status) {
+        case HttpStatus.UNPROCESSABLE_ENTITY:
+          throw new UnprocessableEntityException(error.message);
+        case HttpStatus.NOT_FOUND:
+          throw new NotFoundException(error.message);
+        default:
+          throw new InternalServerErrorException(error.message);
+      }
+    }
   }
 }

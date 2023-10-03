@@ -1,6 +1,5 @@
 import { ProductController } from '@app/controllers/product.controller';
-import { productRequestToDto } from '@app/presenters/product.mapper';
-import { ProductBodyDto } from '@core/domain/dtos/product.dto';
+import { ProductDto } from '@core/domain/dtos/product.dto';
 import { Product } from '@core/infrastructure/entities/product.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from '@services/product.service';
@@ -11,16 +10,16 @@ const productEntity: Partial<Product> = {
   uuid: '5e480b27-7083-4c4f-a460-4f2cf4a27e3a',
 };
 
-const body: ProductBodyDto = {
-  nome: 'Brasilprev Longo Prazo',
+const body: ProductDto = {
+  name: 'Brasilprev Longo Prazo',
   susep: '15414900840201817',
-  expiracaoDeVenda: new Date('2025-01-01T12:00:00.000Z'),
-  valorMinimoAporteInicial: 1000.0,
-  valorMinimoAporteExtra: 100.0,
-  idadeDeEntrada: 18,
-  idadeDeSaida: 60,
-  carenciaInicialDeResgate: 60,
-  carenciaEntreResgates: 30,
+  saleExpiration: new Date('2025-01-01T12:00:00.000Z'),
+  minimumInitialContributionValue: 1000.0,
+  minimumValueExtraContribution: 100.0,
+  entryAge: 18,
+  exitAge: 60,
+  initialRescueGracePeriod: 60,
+  rescueBetweenGracePeriods: 30,
 };
 
 describe('ProductController', () => {
@@ -54,9 +53,7 @@ describe('ProductController', () => {
     it('should create a product successfully', async () => {
       const result = await productController.create(body);
 
-      expect(productService.create).toHaveBeenCalledWith(
-        productRequestToDto(body),
-      );
+      expect(productService.create).toHaveBeenCalledWith(body);
       expect(productService.create).toHaveBeenCalledTimes(1);
       expect(result).toEqual({ id: productEntity.uuid });
     });
@@ -75,9 +72,7 @@ describe('ProductController', () => {
       expect(productController.create(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
-      expect(productService.create).toHaveBeenCalledWith(
-        productRequestToDto(exceptionBody),
-      );
+      expect(productService.create).toHaveBeenCalledWith(exceptionBody);
       expect(productService.create).toHaveBeenCalledTimes(1);
     });
 
@@ -93,9 +88,7 @@ describe('ProductController', () => {
         .mockRejectedValue(new ConflictException(errorMessage));
 
       expect(productController.create(body)).rejects.toThrowError(errorMessage);
-      expect(productService.create).toHaveBeenCalledWith(
-        productRequestToDto(body),
-      );
+      expect(productService.create).toHaveBeenCalledWith(body);
       expect(productService.create).toHaveBeenCalledTimes(1);
     });
   });

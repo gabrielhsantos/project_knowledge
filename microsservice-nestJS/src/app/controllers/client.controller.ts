@@ -1,11 +1,8 @@
 import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ClientService } from '@core/services/client.service';
-import { ClientBodyDto, ClientResponseDto } from '@core/domain/dtos/client.dto';
-import {
-  clientRequestToDto,
-  clientResponse,
-} from '@app/presenters/client.mapper';
+import { ClientDto, ClientResponseDto } from '@core/domain/dtos/client.dto';
+import { clientResponse } from '@app/presenters/client.mapper';
 import { ConflictException } from '@shared/exceptions/conflict.exception';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
 
@@ -25,11 +22,12 @@ export class ClientController {
     description: 'Cliente já cadastrado',
   })
   async create(
-    @Body() clientBodyDto: ClientBodyDto,
-  ): Promise<ClientResponseDto> {
+    @Body() clientDto: ClientDto,
+  ): Promise<
+    ClientResponseDto | ConflictException | InternalServerErrorException
+  > {
     try {
-      const request = clientRequestToDto(clientBodyDto);
-      const newClient = await this.clientService.create(request);
+      const newClient = await this.clientService.create(clientDto);
 
       return clientResponse(newClient);
     } catch (error) {

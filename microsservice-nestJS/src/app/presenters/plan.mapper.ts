@@ -1,16 +1,6 @@
-import { PlanDto, PlanBodyDto } from '@core/domain/dtos/plan.dto';
+import { PlanDto, PlanResponseDto } from '@core/domain/dtos/plan.dto';
 
-export const planRequestToDto = (planBody: PlanBodyDto): PlanDto => {
-  return {
-    clientUuid: planBody.idCliente,
-    productUuid: planBody.idProduto,
-    contribution: planBody.aporte,
-    subscriptionDate: planBody.dataDaContratacao,
-    retirementAge: planBody.idadeDeAposentadoria,
-  };
-};
-
-export const planResponse = (planDB: PlanDto): { id: string } => {
+export const planResponse = (planDB: PlanDto): PlanResponseDto => {
   return {
     id: planDB.uuid!,
   };

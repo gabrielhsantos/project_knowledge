@@ -24,14 +24,14 @@ export class PlanService {
   ) {}
 
   async create(plan: PlanDto): Promise<Plan> {
-    const { clientUuid, productUuid } = plan;
+    const clientUuid = plan.clientId as string;
+    const productUuid = plan.productId as string;
 
-    const clientDb = await this.clientService.findOneClientByUuid(clientUuid!);
+    const clientDb = await this.clientService.findOneClientByUuid(clientUuid);
     if (!clientDb) throw new NotFoundException('Client not found.');
 
-    const productDb = await this.productService.findOneProductByUuid(
-      productUuid!,
-    );
+    const productDb =
+      await this.productService.findOneProductByUuid(productUuid);
     if (!productDb) throw new NotFoundException('Product not found.');
 
     const { isValid, message } = await this.validatePlan(

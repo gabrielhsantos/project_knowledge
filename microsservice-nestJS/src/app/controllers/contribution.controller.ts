@@ -2,13 +2,10 @@ import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ContributionService } from '@core/services/contribution.service';
 import {
-  ContributionBodyDto,
+  ContributionDto,
   ContributionResponseDto,
 } from '@core/domain/dtos/contribution.dto';
-import {
-  contributionRequestToDto,
-  contributionResponse,
-} from '@app/presenters/contribution.mapper';
+import { contributionResponse } from '@app/presenters/contribution.mapper';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 import { NotFoundException } from '@shared/exceptions';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
@@ -25,7 +22,7 @@ export class ContributionController {
     description: 'Aporte inserido com sucesso',
   })
   async create(
-    @Body() contributionBodyDto: ContributionBodyDto,
+    @Body() contributionDto: ContributionDto,
   ): Promise<
     | ContributionResponseDto
     | UnprocessableEntityException
@@ -33,8 +30,8 @@ export class ContributionController {
     | InternalServerErrorException
   > {
     try {
-      const request = contributionRequestToDto(contributionBodyDto);
-      const newContribution = await this.contributionService.create(request);
+      const newContribution =
+        await this.contributionService.create(contributionDto);
 
       return contributionResponse(newContribution);
     } catch (error) {

@@ -1,14 +1,8 @@
 import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductService } from '@core/services/product.service';
-import {
-  ProductBodyDto,
-  ProductResponseDto,
-} from '@core/domain/dtos/product.dto';
-import {
-  productRequestToDto,
-  productResponse,
-} from '@app/presenters/product.mapper';
+import { ProductDto, ProductResponseDto } from '@core/domain/dtos/product.dto';
+import { productResponse } from '@app/presenters/product.mapper';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 import { ConflictException } from '@shared/exceptions/conflict.exception';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
@@ -29,7 +23,7 @@ export class ProductController {
     description: 'Produto já cadastrado',
   })
   async create(
-    @Body() createProductDto: ProductBodyDto,
+    @Body() createProductDto: ProductDto,
   ): Promise<
     | ProductResponseDto
     | UnprocessableEntityException
@@ -37,8 +31,7 @@ export class ProductController {
     | InternalServerErrorException
   > {
     try {
-      const request = productRequestToDto(createProductDto);
-      const newProduct = await this.productService.create(request);
+      const newProduct = await this.productService.create(createProductDto);
 
       return productResponse(newProduct);
     } catch (error) {

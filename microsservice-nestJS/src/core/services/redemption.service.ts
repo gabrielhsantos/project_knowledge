@@ -21,9 +21,9 @@ export class RedemptionService {
   ) {}
 
   async create(redemption: RedemptionDto): Promise<Redemption> {
-    const { planUuid, redemptionValue } = redemption;
+    const planUuid = redemption.planId as string;
 
-    const planDb = await this.planService.findOnePlanByUuid(planUuid!);
+    const planDb = await this.planService.findOnePlanByUuid(planUuid);
     if (!planDb) throw new NotFoundException('Plan not found.');
 
     const contributionTotal =
@@ -39,7 +39,7 @@ export class RedemptionService {
     const newRedemption = await this.redemptionModel.create({
       uuid: uuidv4(),
       planId: planDb.id,
-      redemptionValue,
+      redemptionValue: redemption.redemptionValue,
     });
 
     return newRedemption;

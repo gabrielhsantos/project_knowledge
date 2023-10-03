@@ -1,6 +1,5 @@
 import { RedemptionController } from '@app/controllers/redemption.controller';
-import { redemptionRequestToDto } from '@app/presenters/redemption.mapper';
-import { RedemptionBodyDto } from '@core/domain/dtos/redemption.dto';
+import { RedemptionDto } from '@core/domain/dtos/redemption.dto';
 import { Client } from '@core/infrastructure/entities/client.entity';
 import { Plan } from '@core/infrastructure/entities/plan.entity';
 import { Product } from '@core/infrastructure/entities/product.entity';
@@ -30,9 +29,9 @@ const clientEntity: Partial<Client> = {
   uuid: '18dfeb91-459a-4bc7-9cdd-d93b41f7bf62',
 };
 
-const body: RedemptionBodyDto = {
-  idPlano: '98add7e5-1475-4af0-8478-8a94965e7000',
-  valorResgate: 1000.0,
+const body: RedemptionDto = {
+  planId: '98add7e5-1475-4af0-8478-8a94965e7000',
+  redemptionValue: 1000.0,
 };
 
 describe('RedemptionController', () => {
@@ -88,9 +87,7 @@ describe('RedemptionController', () => {
 
       expect(result).toEqual({ id: redemptionEntity.uuid });
       expect(redemptionService.create).toHaveBeenCalledTimes(1);
-      expect(redemptionService.create).toHaveBeenCalledWith(
-        redemptionRequestToDto(body),
-      );
+      expect(redemptionService.create).toHaveBeenCalledWith(body);
     });
 
     it('should not create a redemption register without a plan', async () => {
@@ -110,9 +107,7 @@ describe('RedemptionController', () => {
       expect(redemptionController.create(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
-      expect(redemptionService.create).toHaveBeenCalledWith(
-        redemptionRequestToDto(exceptionBody),
-      );
+      expect(redemptionService.create).toHaveBeenCalledWith(exceptionBody);
     });
 
     it('should not create a redemption with a invalid age', async () => {

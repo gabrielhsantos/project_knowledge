@@ -21,12 +21,12 @@ describe('ClienteController (e2e)', () => {
 
   it('/POST /clients', async () => {
     const newClient = {
-      cpf: '45645645600',
-      nome: 'José da Silva',
+      document: '45645645600',
+      name: 'José da Silva',
       email: 'jose@cliente.com',
-      dataDeNascimento: '2010-08-24T12:00:00.000Z',
-      genero: 'Masculino',
-      rendaMensal: 2899.5,
+      dob: '2010-08-24T12:00:00.000Z',
+      gender: 'Masculino',
+      income: 2899.5,
     };
 
     const response = await request(app.getHttpServer())

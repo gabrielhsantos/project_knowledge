@@ -28,9 +28,9 @@ describe('ContributionController (e2e)', () => {
     const { clientId, planId } = await testSetupService.setupPlan();
 
     const newContribution = {
-      idCliente: clientId,
-      idPlano: planId,
-      valorAporte: 100.0,
+      clientId,
+      planId,
+      contribution: 100.0,
     };
 
     const response = await request(app.getHttpServer())

@@ -26,11 +26,11 @@ describe('PlanController (e2e)', () => {
 
   it('/POST /plans', async () => {
     const newPlan = {
-      idCliente: (await testSetupService.setupClient()).id,
-      idProduto: (await testSetupService.setupProduct()).id,
-      aporte: 2000.0,
-      dataDaContratacao: '2023-04-05T12:00:00.000Z',
-      idadeDeAposentadoria: 60,
+      clientId: (await testSetupService.setupClient()).id,
+      productId: (await testSetupService.setupProduct()).id,
+      contribution: 2000.0,
+      subscriptionDate: '2023-04-05T12:00:00.000Z',
+      retirementAge: 60,
     };
 
     const response = await request(app.getHttpServer())
