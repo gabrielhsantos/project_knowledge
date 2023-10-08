@@ -9,10 +9,19 @@ import { contributionResponse } from '@app/presenters/contribution.mapper';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 import { NotFoundException } from '@shared/exceptions';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
+import { IRequestHandler } from '@core/domain/interfaces/request-handler.interface';
+
+type handleResponse =
+  | ContributionResponseDto
+  | UnprocessableEntityException
+  | NotFoundException
+  | InternalServerErrorException;
 
 @ApiTags('contributions')
 @Controller('contributions')
-export class ContributionController {
+export class ContributionController
+  implements IRequestHandler<Promise<handleResponse>>
+{
   constructor(private readonly contributionService: ContributionService) {}
 
   @Post()
@@ -21,14 +30,9 @@ export class ContributionController {
     status: 201,
     description: 'Aporte inserido com sucesso',
   })
-  async create(
+  async handle(
     @Body() contributionDto: ContributionDto,
-  ): Promise<
-    | ContributionResponseDto
-    | UnprocessableEntityException
-    | NotFoundException
-    | InternalServerErrorException
-  > {
+  ): Promise<handleResponse> {
     try {
       const newContribution =
         await this.contributionService.create(contributionDto);

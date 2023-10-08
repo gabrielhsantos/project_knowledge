@@ -1,6 +1,7 @@
 import { ClientController } from '@app/controllers/client.controller';
 import { ClientDto } from '@core/domain/dtos/client.dto';
 import { Client } from '@core/infrastructure/entities/client.entity';
+import { ClientRepository } from '@core/infrastructure/repositories/client.repository';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClientService } from '@services/client.service';
 import { ConflictException } from '@shared/exceptions/conflict.exception';
@@ -21,6 +22,7 @@ const body: ClientDto = {
 describe('ClientController', () => {
   let clientController: ClientController;
   let clientService: ClientService;
+  let clientRepository: ClientRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,7 +32,13 @@ describe('ClientController', () => {
           provide: ClientService,
           useValue: {
             create: jest.fn().mockResolvedValue(clientEntity),
-            findOneClientByDocument: jest.fn().mockResolvedValue(null),
+          },
+        },
+        {
+          provide: ClientRepository,
+          useValue: {
+            create: jest.fn().mockResolvedValue(clientEntity),
+            findOneByDocument: jest.fn().mockResolvedValue(null),
           },
         },
       ],
@@ -38,16 +46,18 @@ describe('ClientController', () => {
 
     clientController = module.get<ClientController>(ClientController);
     clientService = module.get<ClientService>(ClientService);
+    clientRepository = module.get<ClientRepository>(ClientRepository);
   });
 
   it('should be defined', () => {
     expect(clientController).toBeDefined();
     expect(clientService).toBeDefined();
+    expect(clientRepository).toBeDefined();
   });
 
   describe('store', () => {
     it('should create a client successfully', async () => {
-      const result = await clientController.create(body);
+      const result = await clientController.handle(body);
 
       expect(clientService.create).toHaveBeenCalledWith(body);
       expect(clientService.create).toHaveBeenCalledTimes(1);
@@ -58,14 +68,14 @@ describe('ClientController', () => {
       const errorMessage = 'Client already registered.';
 
       jest
-        .spyOn(clientService, 'findOneClientByDocument')
+        .spyOn(clientRepository, 'findOneByDocument')
         .mockResolvedValue(clientEntity as Client);
 
       jest
         .spyOn(clientService, 'create')
         .mockRejectedValue(new ConflictException(errorMessage));
 
-      expect(clientController.create(body)).rejects.toThrowError(errorMessage);
+      expect(clientController.handle(body)).rejects.toThrowError(errorMessage);
       expect(clientService.create).toHaveBeenCalledWith(body);
       expect(clientService.create).toHaveBeenCalledTimes(1);
     });

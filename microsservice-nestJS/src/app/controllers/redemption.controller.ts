@@ -9,10 +9,19 @@ import { redemptionResponse } from '@app/presenters/redemption.mapper';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 import { NotFoundException } from '@shared/exceptions/not-found.exception';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
+import { IRequestHandler } from '@core/domain/interfaces/request-handler.interface';
+
+type handleResponse =
+  | RedemptionResponseDto
+  | UnprocessableEntityException
+  | NotFoundException
+  | InternalServerErrorException;
 
 @ApiTags('redemptions')
 @Controller('redemptions')
-export class RedemptionController {
+export class RedemptionController
+  implements IRequestHandler<Promise<handleResponse>>
+{
   constructor(private readonly redemptionService: RedemptionService) {}
 
   @Post()
@@ -21,14 +30,7 @@ export class RedemptionController {
     status: 201,
     description: 'Redemption created',
   })
-  async create(
-    @Body() redemptionDto: RedemptionDto,
-  ): Promise<
-    | RedemptionResponseDto
-    | UnprocessableEntityException
-    | NotFoundException
-    | InternalServerErrorException
-  > {
+  async handle(@Body() redemptionDto: RedemptionDto): Promise<handleResponse> {
     try {
       const newRedemption = await this.redemptionService.create(redemptionDto);
 

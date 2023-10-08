@@ -1,31 +1,33 @@
 import { ContributionDto } from '@core/domain/dtos/contribution.dto';
 import { Contribution } from '@core/infrastructure/entities/contribution.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { ClientService } from './client.service';
-import { PlanService } from './plan.service';
 import { NotFoundException } from '@shared/exceptions';
 import { Plan } from '@core/infrastructure/entities/plan.entity';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
+import { ContributionRepository } from '@core/infrastructure/repositories/contribution.repository';
+import { PlanRepository } from '@core/infrastructure/repositories/plan.repository';
+import { ClientRepository } from '@core/infrastructure/repositories/client.repository';
+import { ICreateService } from '@core/domain/interfaces/service.interface';
 
 @Injectable()
-export class ContributionService {
+export class ContributionService
+  implements ICreateService<ContributionDto, Promise<Contribution>>
+{
   constructor(
-    @InjectModel(Contribution)
-    private readonly contributionModel: typeof Contribution,
-    private readonly clientService: ClientService,
-    private readonly planService: PlanService,
+    private readonly contributionRepository: ContributionRepository,
+    private readonly clientRepository: ClientRepository,
+    private readonly planRepository: PlanRepository,
   ) {}
 
   async create(contribution: ContributionDto): Promise<Contribution> {
     const clientUuid = contribution.clientId as string;
     const planUuid = contribution.planId as string;
 
-    const clientDb = await this.clientService.findOneClientByUuid(clientUuid);
+    const clientDb = await this.clientRepository.findOneByUuid(clientUuid);
     if (!clientDb) throw new NotFoundException('Client not found.');
 
-    const planDb = await this.planService.findOnePlanByUuid(planUuid);
+    const planDb = await this.planRepository.findOneByUuid(planUuid);
     if (!planDb) throw new NotFoundException('Plan not found.');
 
     const { isValid, message } = await this.validateContribution(
@@ -34,21 +36,11 @@ export class ContributionService {
     );
     if (!isValid) throw new UnprocessableEntityException(message!);
 
-    return await this.contributionModel.create({
+    return await this.contributionRepository.create({
       uuid: uuidv4(),
       clientId: clientDb.id,
       planId: planDb.id,
       contribution: contribution.contribution,
-    });
-  }
-
-  async findOneContibution(uuid: string): Promise<Contribution | null> {
-    return await this.contributionModel.findOne({ where: { uuid } });
-  }
-
-  async getTotalContributionByPlanId(planId: number): Promise<number> {
-    return await this.contributionModel.sum('contribution', {
-      where: { planId },
     });
   }
 

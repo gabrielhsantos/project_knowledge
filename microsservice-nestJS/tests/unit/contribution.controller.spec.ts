@@ -4,10 +4,11 @@ import { Client } from '@core/infrastructure/entities/client.entity';
 import { Contribution } from '@core/infrastructure/entities/contribution.entity';
 import { Plan } from '@core/infrastructure/entities/plan.entity';
 import { Product } from '@core/infrastructure/entities/product.entity';
+import { ClientRepository } from '@core/infrastructure/repositories/client.repository';
+import { ContributionRepository } from '@core/infrastructure/repositories/contribution.repository';
+import { PlanRepository } from '@core/infrastructure/repositories/plan.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ClientService } from '@services/client.service';
 import { ContributionService } from '@services/contribution.service';
-import { PlanService } from '@services/plan.service';
 import { NotFoundException } from '@shared/exceptions/not-found.exception';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 
@@ -37,8 +38,9 @@ const body: ContributionDto = {
 describe('ContributionController', () => {
   let contributionController: ContributionController;
   let contributionService: ContributionService;
-  let planService: PlanService;
-  let clientService: ClientService;
+  let contributionRepository: ContributionRepository;
+  let clientRepository: ClientRepository;
+  let planRepository: PlanRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -51,15 +53,21 @@ describe('ContributionController', () => {
           },
         },
         {
-          provide: PlanService,
+          provide: ContributionRepository,
           useValue: {
-            findOnePlanByUuid: jest.fn().mockResolvedValue(planEntity),
+            create: jest.fn().mockResolvedValue(contributionEntity),
           },
         },
         {
-          provide: ClientService,
+          provide: ClientRepository,
           useValue: {
-            findOneClientByUuid: jest.fn().mockResolvedValue(clientEntity),
+            findOneByUuid: jest.fn().mockResolvedValue(clientEntity),
+          },
+        },
+        {
+          provide: PlanRepository,
+          useValue: {
+            findOneByUuid: jest.fn().mockResolvedValue(planEntity),
           },
         },
       ],
@@ -69,20 +77,24 @@ describe('ContributionController', () => {
       ContributionController,
     );
     contributionService = module.get<ContributionService>(ContributionService);
-    planService = module.get<PlanService>(PlanService);
-    clientService = module.get<ClientService>(ClientService);
+    contributionRepository = module.get<ContributionRepository>(
+      ContributionRepository,
+    );
+    clientRepository = module.get<ClientRepository>(ClientRepository);
+    planRepository = module.get<PlanRepository>(PlanRepository);
   });
 
   it('should be defined', () => {
     expect(contributionController).toBeDefined();
     expect(contributionService).toBeDefined();
-    expect(planService).toBeDefined();
-    expect(clientService).toBeDefined();
+    expect(contributionRepository).toBeDefined();
+    expect(clientRepository).toBeDefined();
+    expect(planRepository).toBeDefined();
   });
 
   describe('store', () => {
     it('should create a contribution successfully', async () => {
-      const result = await contributionController.create(body);
+      const result = await contributionController.handle(body);
 
       expect(contributionService.create).toHaveBeenCalledWith(body);
       expect(contributionService.create).toHaveBeenCalledTimes(1);
@@ -97,13 +109,13 @@ describe('ContributionController', () => {
         idCliente: '6f3f167d-d9e5-4cf7-a6e5-33410da4c77e',
       };
 
-      jest.spyOn(clientService, 'findOneClientByUuid').mockResolvedValue(null);
+      jest.spyOn(clientRepository, 'findOneByUuid').mockResolvedValue(null);
 
       jest
         .spyOn(contributionService, 'create')
         .mockRejectedValue(new NotFoundException(errorMessage));
 
-      expect(contributionController.create(exceptionBody)).rejects.toThrowError(
+      expect(contributionController.handle(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
       expect(contributionService.create).toHaveBeenCalledWith(exceptionBody);
@@ -117,13 +129,13 @@ describe('ContributionController', () => {
         idPlano: '6f3f167d-d9e5-4cf7-a6e5-33410da4c77e',
       };
 
-      jest.spyOn(planService, 'findOnePlanByUuid').mockResolvedValue(null);
+      jest.spyOn(planRepository, 'findOneByUuid').mockResolvedValue(null);
 
       jest
         .spyOn(contributionService, 'create')
         .mockRejectedValue(new NotFoundException(errorMessage));
 
-      expect(contributionController.create(exceptionBody)).rejects.toThrowError(
+      expect(contributionController.handle(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
       expect(contributionService.create).toHaveBeenCalledWith(exceptionBody);
@@ -133,14 +145,14 @@ describe('ContributionController', () => {
       const errorMessage = `Contribution does not meet the minimum value of R$100.`;
 
       jest
-        .spyOn(planService, 'findOnePlanByUuid')
+        .spyOn(planRepository, 'findOneByUuid')
         .mockResolvedValue({ ...planEntity, product: productEntity } as Plan);
 
       jest
         .spyOn(contributionService, 'create')
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
-      expect(contributionController.create(body)).rejects.toThrowError(
+      expect(contributionController.handle(body)).rejects.toThrowError(
         errorMessage,
       );
       expect(contributionService.create).toHaveBeenCalledWith(body);

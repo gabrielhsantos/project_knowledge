@@ -1,6 +1,7 @@
 import { ProductController } from '@app/controllers/product.controller';
 import { ProductDto } from '@core/domain/dtos/product.dto';
 import { Product } from '@core/infrastructure/entities/product.entity';
+import { ProductRepository } from '@core/infrastructure/repositories/product.repository';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from '@services/product.service';
 import { ConflictException } from '@shared/exceptions/conflict.exception';
@@ -25,6 +26,7 @@ const body: ProductDto = {
 describe('ProductController', () => {
   let productController: ProductController;
   let productService: ProductService;
+  let productRepository: ProductRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +36,13 @@ describe('ProductController', () => {
           provide: ProductService,
           useValue: {
             create: jest.fn().mockResolvedValue(productEntity),
-            findOneProductBySusep: jest.fn().mockResolvedValue(null),
+          },
+        },
+        {
+          provide: ProductRepository,
+          useValue: {
+            create: jest.fn().mockResolvedValue(productEntity),
+            findOneBySusep: jest.fn().mockResolvedValue(null),
           },
         },
       ],
@@ -42,16 +50,18 @@ describe('ProductController', () => {
 
     productController = module.get<ProductController>(ProductController);
     productService = module.get<ProductService>(ProductService);
+    productRepository = module.get<ProductRepository>(ProductRepository);
   });
 
   it('should be defined', () => {
     expect(productController).toBeDefined();
     expect(productService).toBeDefined();
+    expect(productRepository).toBeDefined();
   });
 
   describe('store', () => {
     it('should create a product successfully', async () => {
-      const result = await productController.create(body);
+      const result = await productController.handle(body);
 
       expect(productService.create).toHaveBeenCalledWith(body);
       expect(productService.create).toHaveBeenCalledTimes(1);
@@ -69,7 +79,7 @@ describe('ProductController', () => {
         .spyOn(productService, 'create')
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
-      expect(productController.create(exceptionBody)).rejects.toThrowError(
+      expect(productController.handle(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
       expect(productService.create).toHaveBeenCalledWith(exceptionBody);
@@ -80,14 +90,14 @@ describe('ProductController', () => {
       const errorMessage = 'Product already registered.';
 
       jest
-        .spyOn(productService, 'findOneProductBySusep')
+        .spyOn(productRepository, 'findOneBySusep')
         .mockResolvedValue(productEntity as Product);
 
       jest
         .spyOn(productService, 'create')
         .mockRejectedValue(new ConflictException(errorMessage));
 
-      expect(productController.create(body)).rejects.toThrowError(errorMessage);
+      expect(productController.handle(body)).rejects.toThrowError(errorMessage);
       expect(productService.create).toHaveBeenCalledWith(body);
       expect(productService.create).toHaveBeenCalledTimes(1);
     });

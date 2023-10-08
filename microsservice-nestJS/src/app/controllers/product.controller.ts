@@ -6,10 +6,19 @@ import { productResponse } from '@app/presenters/product.mapper';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 import { ConflictException } from '@shared/exceptions/conflict.exception';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
+import { IRequestHandler } from '@core/domain/interfaces/request-handler.interface';
+
+type handleResponse =
+  | ProductResponseDto
+  | UnprocessableEntityException
+  | ConflictException
+  | InternalServerErrorException;
 
 @ApiTags('products')
 @Controller('products')
-export class ProductController {
+export class ProductController
+  implements IRequestHandler<Promise<handleResponse>>
+{
   constructor(private readonly productService: ProductService) {}
 
   @Post()
@@ -22,14 +31,7 @@ export class ProductController {
     status: 409,
     description: 'Produto já cadastrado',
   })
-  async create(
-    @Body() createProductDto: ProductDto,
-  ): Promise<
-    | ProductResponseDto
-    | UnprocessableEntityException
-    | ConflictException
-    | InternalServerErrorException
-  > {
+  async handle(@Body() createProductDto: ProductDto): Promise<handleResponse> {
     try {
       const newProduct = await this.productService.create(createProductDto);
 

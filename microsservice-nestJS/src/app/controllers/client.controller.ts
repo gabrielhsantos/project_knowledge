@@ -5,10 +5,18 @@ import { ClientDto, ClientResponseDto } from '@core/domain/dtos/client.dto';
 import { clientResponse } from '@app/presenters/client.mapper';
 import { ConflictException } from '@shared/exceptions/conflict.exception';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
+import { IRequestHandler } from '@core/domain/interfaces/request-handler.interface';
+
+type handleResponse =
+  | ClientResponseDto
+  | ConflictException
+  | InternalServerErrorException;
 
 @ApiTags('clients')
 @Controller('clients')
-export class ClientController {
+export class ClientController
+  implements IRequestHandler<Promise<handleResponse>>
+{
   constructor(private readonly clientService: ClientService) {}
 
   @Post()
@@ -21,11 +29,7 @@ export class ClientController {
     status: 409,
     description: 'Cliente já cadastrado',
   })
-  async create(
-    @Body() clientDto: ClientDto,
-  ): Promise<
-    ClientResponseDto | ConflictException | InternalServerErrorException
-  > {
+  async handle(@Body() clientDto: ClientDto): Promise<handleResponse> {
     try {
       const newClient = await this.clientService.create(clientDto);
 

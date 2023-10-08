@@ -4,9 +4,10 @@ import { Client } from '@core/infrastructure/entities/client.entity';
 import { Plan } from '@core/infrastructure/entities/plan.entity';
 import { Product } from '@core/infrastructure/entities/product.entity';
 import { Redemption } from '@core/infrastructure/entities/redemption.entity';
+import { ContributionRepository } from '@core/infrastructure/repositories/contribution.repository';
+import { PlanRepository } from '@core/infrastructure/repositories/plan.repository';
+import { RedemptionRepository } from '@core/infrastructure/repositories/redemption.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ContributionService } from '@services/contribution.service';
-import { PlanService } from '@services/plan.service';
 import { RedemptionService } from '@services/redemption.service';
 import { NotFoundException } from '@shared/exceptions/not-found.exception';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
@@ -37,8 +38,9 @@ const body: RedemptionDto = {
 describe('RedemptionController', () => {
   let redemptionController: RedemptionController;
   let redemptionService: RedemptionService;
-  let planService: PlanService;
-  let contributionService: ContributionService;
+  let redemptionRepository: RedemptionRepository;
+  let planRepository: PlanRepository;
+  let contributionRepository: ContributionRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -51,7 +53,13 @@ describe('RedemptionController', () => {
           },
         },
         {
-          provide: ContributionService,
+          provide: RedemptionRepository,
+          useValue: {
+            create: jest.fn().mockResolvedValue(redemptionEntity),
+          },
+        },
+        {
+          provide: ContributionRepository,
           useValue: {
             getTotalContributionByPlanId: jest
               .fn()
@@ -59,9 +67,9 @@ describe('RedemptionController', () => {
           },
         },
         {
-          provide: PlanService,
+          provide: PlanRepository,
           useValue: {
-            findOnePlanByUuid: jest.fn().mockResolvedValue(planEntity),
+            findOneByUuid: jest.fn().mockResolvedValue(planEntity),
           },
         },
       ],
@@ -70,20 +78,25 @@ describe('RedemptionController', () => {
     redemptionController =
       module.get<RedemptionController>(RedemptionController);
     redemptionService = module.get<RedemptionService>(RedemptionService);
-    planService = module.get<PlanService>(PlanService);
-    contributionService = module.get<ContributionService>(ContributionService);
+    redemptionRepository =
+      module.get<RedemptionRepository>(RedemptionRepository);
+    planRepository = module.get<PlanRepository>(PlanRepository);
+    contributionRepository = module.get<ContributionRepository>(
+      ContributionRepository,
+    );
   });
 
   it('should be defined', () => {
     expect(redemptionController).toBeDefined();
     expect(redemptionService).toBeDefined();
-    expect(planService).toBeDefined();
-    expect(contributionService).toBeDefined();
+    expect(redemptionRepository).toBeDefined();
+    expect(planRepository).toBeDefined();
+    expect(contributionRepository).toBeDefined();
   });
 
   describe('store', () => {
     it('should create a redemption register successfully', async () => {
-      const result = await redemptionController.create(body);
+      const result = await redemptionController.handle(body);
 
       expect(result).toEqual({ id: redemptionEntity.uuid });
       expect(redemptionService.create).toHaveBeenCalledTimes(1);
@@ -98,13 +111,13 @@ describe('RedemptionController', () => {
         idPlano: '6f3f167d-d9e5-4cf7-a6e5-33410da4c77e',
       };
 
-      jest.spyOn(planService, 'findOnePlanByUuid').mockResolvedValue(null);
+      jest.spyOn(planRepository, 'findOneByUuid').mockResolvedValue(null);
 
       jest
         .spyOn(redemptionService, 'create')
         .mockRejectedValue(new NotFoundException(errorMessage));
 
-      expect(redemptionController.create(exceptionBody)).rejects.toThrowError(
+      expect(redemptionController.handle(exceptionBody)).rejects.toThrowError(
         errorMessage,
       );
       expect(redemptionService.create).toHaveBeenCalledWith(exceptionBody);
@@ -113,7 +126,7 @@ describe('RedemptionController', () => {
     it('should not create a redemption with a invalid age', async () => {
       const errorMessage = 'Invalid age to redeem values.';
 
-      jest.spyOn(planService, 'findOnePlanByUuid').mockResolvedValue({
+      jest.spyOn(planRepository, 'findOneByUuid').mockResolvedValue({
         ...planEntity,
         retirementAge: 60,
         client: {
@@ -126,7 +139,7 @@ describe('RedemptionController', () => {
         .spyOn(redemptionService, 'create')
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
-      expect(redemptionController.create(body)).rejects.toThrowError(
+      expect(redemptionController.handle(body)).rejects.toThrowError(
         errorMessage,
       );
     });
@@ -134,7 +147,7 @@ describe('RedemptionController', () => {
     it('should not create a redemption with a invalid date to redeem values', async () => {
       const errorMessage = 'Invalid date to redeem values.';
 
-      jest.spyOn(planService, 'findOnePlanByUuid').mockResolvedValue({
+      jest.spyOn(planRepository, 'findOneByUuid').mockResolvedValue({
         ...planEntity,
         retirementAge: 60,
         subscriptionDate: new Date(),
@@ -152,7 +165,7 @@ describe('RedemptionController', () => {
         .spyOn(redemptionService, 'create')
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
-      expect(redemptionController.create(body)).rejects.toThrowError(
+      expect(redemptionController.handle(body)).rejects.toThrowError(
         errorMessage,
       );
     });
@@ -162,14 +175,14 @@ describe('RedemptionController', () => {
         'Amount requested above the available redemption limit.';
 
       jest
-        .spyOn(contributionService, 'getTotalContributionByPlanId')
+        .spyOn(contributionRepository, 'getTotalContributionByPlanId')
         .mockResolvedValue(100.0);
 
       jest
         .spyOn(redemptionService, 'create')
         .mockRejectedValue(new UnprocessableEntityException(errorMessage));
 
-      expect(redemptionController.create(body)).rejects.toThrowError(
+      expect(redemptionController.handle(body)).rejects.toThrowError(
         errorMessage,
       );
     });

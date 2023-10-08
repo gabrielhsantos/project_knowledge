@@ -1,39 +1,33 @@
 import { ProductDto } from '@core/domain/dtos/product.dto';
+import { ICreateService } from '@core/domain/interfaces/service.interface';
 import { Product } from '@core/infrastructure/entities/product.entity';
+import { ProductRepository } from '@core/infrastructure/repositories/product.repository';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { ConflictException } from '@shared/exceptions/conflict.exception';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class ProductService {
-  constructor(
-    @InjectModel(Product)
-    private readonly productModel: typeof Product,
-  ) {}
+export class ProductService
+  implements ICreateService<ProductDto, Promise<Product>>
+{
+  constructor(private readonly productRepository: ProductRepository) {}
 
   async create(product: ProductDto): Promise<Product> {
     const { isValid, message } = await this.validateProduct(product);
     if (!isValid) throw new UnprocessableEntityException(message!);
 
-    const productDb = await this.findOneProductBySusep(product.susep);
+    const productDb = await this.productRepository.findOneBySusep(
+      product.susep,
+    );
     if (productDb) throw new ConflictException('Product already registered.');
 
-    const newProduct = await this.productModel.create({
+    const newProduct = await this.productRepository.create({
       uuid: uuidv4(),
       ...product,
     });
 
     return newProduct;
-  }
-
-  async findOneProductByUuid(uuid: string): Promise<Product | null> {
-    return await this.productModel.findOne({ where: { uuid } });
-  }
-
-  async findOneProductBySusep(susep: string): Promise<Product | null> {
-    return await this.productModel.findOne({ where: { susep } });
   }
 
   private async validateProduct(

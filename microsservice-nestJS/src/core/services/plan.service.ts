@@ -1,37 +1,35 @@
 import { PlanDto } from '@core/domain/dtos/plan.dto';
 import { Plan } from '@core/infrastructure/entities/plan.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { ClientService } from './client.service';
-import { ProductService } from './product.service';
 import { NotFoundException } from '@shared/exceptions';
 import { Product } from '@core/infrastructure/entities/product.entity';
 import { Client } from '@core/infrastructure/entities/client.entity';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
-import { Contribution } from '@core/infrastructure/entities/contribution.entity';
 import { getAge } from '@shared/utils/get-age';
+import { ClientRepository } from '@core/infrastructure/repositories/client.repository';
+import { ProductRepository } from '@core/infrastructure/repositories/product.repository';
+import { PlanRepository } from '@core/infrastructure/repositories/plan.repository';
+import { ContributionRepository } from '@core/infrastructure/repositories/contribution.repository';
+import { ICreateService } from '@core/domain/interfaces/service.interface';
 
 @Injectable()
-export class PlanService {
+export class PlanService implements ICreateService<PlanDto, Promise<Plan>> {
   constructor(
-    @InjectModel(Plan)
-    private readonly planModel: typeof Plan,
-    @InjectModel(Contribution)
-    private readonly contributionModel: typeof Contribution,
-    private readonly clientService: ClientService,
-    private readonly productService: ProductService,
+    private readonly clientRepository: ClientRepository,
+    private readonly productRepository: ProductRepository,
+    private readonly planRepository: PlanRepository,
+    private readonly contributionRepository: ContributionRepository,
   ) {}
 
   async create(plan: PlanDto): Promise<Plan> {
     const clientUuid = plan.clientId as string;
     const productUuid = plan.productId as string;
 
-    const clientDb = await this.clientService.findOneClientByUuid(clientUuid);
+    const clientDb = await this.clientRepository.findOneByUuid(clientUuid);
     if (!clientDb) throw new NotFoundException('Client not found.');
 
-    const productDb =
-      await this.productService.findOneProductByUuid(productUuid);
+    const productDb = await this.productRepository.findOneByUuid(productUuid);
     if (!productDb) throw new NotFoundException('Product not found.');
 
     const { isValid, message } = await this.validatePlan(
@@ -41,7 +39,7 @@ export class PlanService {
     );
     if (!isValid) throw new UnprocessableEntityException(message!);
 
-    const newPlan = await this.planModel.create({
+    const newPlan = await this.planRepository.create({
       uuid: uuidv4(),
       clientId: clientDb.id,
       productId: productDb.id,
@@ -50,7 +48,7 @@ export class PlanService {
       retirementAge: plan.retirementAge,
     });
 
-    await this.contributionModel.create({
+    await this.contributionRepository.create({
       uuid: uuidv4(),
       clientId: clientDb.id,
       planId: newPlan.id,
@@ -58,13 +56,6 @@ export class PlanService {
     });
 
     return newPlan;
-  }
-
-  async findOnePlanByUuid(uuid: string): Promise<Plan | null> {
-    return await this.planModel.findOne({
-      where: { uuid },
-      include: [{ model: Product }, { model: Client }],
-    });
   }
 
   private async validatePlan(

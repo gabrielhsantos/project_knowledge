@@ -1,16 +1,24 @@
 import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PlanService } from '@core/services/plan.service';
-import { PlanDto } from '@core/domain/dtos/plan.dto';
+import { PlanDto, PlanResponseDto } from '@core/domain/dtos/plan.dto';
 import { planResponse } from '@app/presenters/plan.mapper';
-import { ProductResponseDto } from '@core/domain/dtos/product.dto';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
 import { NotFoundException } from '@shared/exceptions/not-found.exception';
+import { IRequestHandler } from '@core/domain/interfaces/request-handler.interface';
+
+type handleResponse =
+  | PlanResponseDto
+  | UnprocessableEntityException
+  | NotFoundException
+  | InternalServerErrorException;
 
 @ApiTags('plans')
 @Controller('plans')
-export class PlanController {
+export class PlanController
+  implements IRequestHandler<Promise<handleResponse>>
+{
   constructor(private readonly planService: PlanService) {}
 
   @Post()
@@ -19,14 +27,7 @@ export class PlanController {
     status: 201,
     description: 'Plano cadastrado com sucesso',
   })
-  async create(
-    @Body() createPlanDto: PlanDto,
-  ): Promise<
-    | ProductResponseDto
-    | UnprocessableEntityException
-    | NotFoundException
-    | InternalServerErrorException
-  > {
+  async handle(@Body() createPlanDto: PlanDto): Promise<handleResponse> {
     try {
       const newPlan = await this.planService.create(createPlanDto);
 
