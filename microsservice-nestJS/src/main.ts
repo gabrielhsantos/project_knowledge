@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from '@modules/app.module';
 import { mapEnvToConfiguration } from '@modules/env/map-env-to-configuration';
-import { config } from '@modules/doc/doc-builder';
+import { config } from '@modules/document/doc-builder';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

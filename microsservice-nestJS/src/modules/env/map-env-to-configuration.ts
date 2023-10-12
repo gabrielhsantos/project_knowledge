@@ -2,7 +2,7 @@ import { TEnvironmentConfig } from './types';
 
 export const mapEnvToConfiguration = (): TEnvironmentConfig => ({
   api: {
-    port: parseInt(process.env.API_PORT as string),
+    port: parseInt(process.env.API_PORT!),
   },
   db: {
     dialect: process.env.DIALECT!,
@@ -12,5 +12,8 @@ export const mapEnvToConfiguration = (): TEnvironmentConfig => ({
     password: process.env.DB_PASS!,
     database: process.env.DB_NAME!,
     storage: process.env.DB_STORAGE!,
+  },
+  auth: {
+    secret: process.env.AUTH_SECRET!,
   },
 });

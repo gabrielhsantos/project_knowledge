@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@modules/env/config.module';
 import { DatabaseModule } from '@modules/database/database.module';
-import { ClientModule } from './entities/clients.module';
-import { ProductModule } from './entities/products.module';
-import { PlanModule } from './entities/plans.module';
-import { ContributionModule } from './entities/contributions.module';
-import { RedemptionModule } from './entities/redemptions.module';
+import { CartModule } from './entities/carts.module';
+import { MiddlwareModule } from './middleware/middleware.module';
+import { BookModule } from './entities/books.module';
+import { UserModule } from './entities/users.module';
+import { LoginModule } from './auth/login.module';
 
 @Module({
   imports: [
     ConfigModule,
     DatabaseModule,
-    ClientModule,
-    ProductModule,
-    PlanModule,
-    ContributionModule,
-    RedemptionModule,
+    MiddlwareModule,
+    BookModule,
+    UserModule,
+    LoginModule,
+    CartModule,
   ],
   controllers: [],
   providers: [],
