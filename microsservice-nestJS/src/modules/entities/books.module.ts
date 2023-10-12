@@ -8,7 +8,7 @@ import { CreateBookService } from '@services/book/create-book.service';
 import { BookFactory } from '@core/domain/factories/book.factory';
 import { CreateBookController } from '@app/controllers/book/create-book.controller';
 import { FindBooksListController } from '@app/controllers/book/find-books-list.controller';
-import { FindBooksListBookService } from '@services/book/find-books-list.service';
+import { FindBooksListService } from '@services/book/find-books-list.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([Cart, CartBook, Book])],
@@ -16,7 +16,7 @@ import { FindBooksListBookService } from '@services/book/find-books-list.service
     BookFactory,
     BookRepository,
     CreateBookService,
-    FindBooksListBookService,
+    FindBooksListService,
   ],
   controllers: [CreateBookController, FindBooksListController],
 })

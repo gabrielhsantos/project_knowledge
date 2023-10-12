@@ -5,7 +5,7 @@ import { InternalServerErrorException } from '@shared/exceptions/internal-server
 import { IRequestHandler } from '@core/domain/interfaces/request-handler.interface';
 import { BookResponseDto } from '@core/domain/dtos/book.dto';
 import { bookListResponse } from '@app/presenters/book.mapper';
-import { FindBooksListBookService } from '@services/book/find-books-list.service';
+import { FindBooksListService } from '@services/book/find-books-list.service';
 
 type handleResponse = BookResponseDto[] | InternalServerErrorException;
 
@@ -14,7 +14,7 @@ type handleResponse = BookResponseDto[] | InternalServerErrorException;
 export class FindBooksListController
   implements IRequestHandler<Promise<handleResponse>>
 {
-  constructor(private readonly bookService: FindBooksListBookService) {}
+  constructor(private readonly bookService: FindBooksListService) {}
 
   @Get()
   @ApiOperation({ summary: 'Listagem de livros.' })

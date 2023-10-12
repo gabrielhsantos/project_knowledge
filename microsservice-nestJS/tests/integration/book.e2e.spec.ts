@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@modules/app.module';
 
-describe('ClienteController (e2e)', () => {
+describe('CreateBookController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -19,19 +19,16 @@ describe('ClienteController (e2e)', () => {
     await app.close();
   });
 
-  it('/POST /clients', async () => {
-    const newClient = {
-      document: '45645645600',
-      name: 'José da Silva',
-      email: 'jose@cliente.com',
-      dob: '2010-08-24T12:00:00.000Z',
-      gender: 'Masculino',
-      income: 2899.5,
+  it('/POST /books', async () => {
+    const newBook = {
+      name: 'The Lord of The Rings',
+      value: 49.99,
+      stock: 1,
     };
 
     const response = await request(app.getHttpServer())
-      .post(`/clients`)
-      .send(newClient);
+      .post(`/books`)
+      .send(newBook);
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('id');

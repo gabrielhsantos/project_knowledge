@@ -1,5 +1,5 @@
 import { LoginController } from '@app/controllers/auth/login.controller';
-import { CartController } from '@app/controllers/cart/create-cart.controller';
+import { CreateCartController } from '@app/controllers/cart/create-cart.controller';
 import { AuthMiddleware } from '@app/middlewares/auth.middleware';
 import { LoggerMiddleware } from '@app/middlewares/logger.middleware';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
@@ -12,6 +12,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 export class MiddlwareModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes(LoginController);
-    consumer.apply(AuthMiddleware).forRoutes(CartController);
+    consumer.apply(AuthMiddleware).forRoutes(CreateCartController);
   }
 }

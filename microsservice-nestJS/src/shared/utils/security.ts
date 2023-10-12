@@ -3,10 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 
 const { auth } = mapEnvToConfiguration();
 
-export const generateToken = (uuid: string) => {
+export const generateToken = (uuid: string, secret?: string) => {
   return new JwtService().sign(
     { userId: uuid, iat: Date.now() },
-    { secret: auth.secret },
+    { secret: secret ?? auth.secret },
   );
 };
 
@@ -14,6 +14,6 @@ export const decodeToken = (token: string) => {
   return new JwtService().decode(token);
 };
 
-export const verifyToken = (token: string) => {
-  return new JwtService().verify(token, { secret: auth.secret });
+export const verifyToken = (token: string, secret?: string) => {
+  return new JwtService().verify(token, { secret: secret ?? auth.secret });
 };

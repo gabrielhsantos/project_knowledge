@@ -4,8 +4,9 @@ import * as request from 'supertest';
 import { AppModule } from '@modules/app.module';
 import { TestModule } from '@modules/test/test.module';
 import { TestSetupService } from '../setupTests';
+import { generateToken } from '@shared/utils/security';
 
-describe('ContributionController (e2e)', () => {
+describe('CreateCartController (e2e)', () => {
   let app: INestApplication;
   let testSetupService: TestSetupService;
 
@@ -24,18 +25,25 @@ describe('ContributionController (e2e)', () => {
     await app.close();
   });
 
-  it('/POST /contributions', async () => {
-    const { clientId, planId } = await testSetupService.setupPlan();
+  it('/POST /carts', async () => {
+    const book = await testSetupService.setupBook();
+    const user = await testSetupService.setupUser();
 
-    const newContribution = {
-      clientId,
-      planId,
-      contribution: 100.0,
+    const token = generateToken(user.id, 'test');
+
+    const newCart = {
+      books: [
+        {
+          id: book.id,
+          qty: 1,
+        },
+      ],
     };
 
     const response = await request(app.getHttpServer())
-      .post(`/contributions`)
-      .send(newContribution);
+      .post(`/carts`)
+      .set({ Authorization: token })
+      .send(newCart);
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('id');

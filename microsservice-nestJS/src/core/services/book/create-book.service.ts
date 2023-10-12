@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { BookBodyDto } from '@core/domain/dtos/book.dto';
 import { Book } from '@core/infrastructure/entities/books.entity';
 import { BookFactory } from '@core/domain/factories/book.factory';
+import { BadRequestException } from '@shared/exceptions';
 
 @Injectable()
 export class CreateBookService
@@ -16,6 +17,9 @@ export class CreateBookService
   ) {}
 
   async create({ name, value, stock }: BookBodyDto): Promise<Book> {
+    if (stock && stock <= 0)
+      throw new BadRequestException('Invalid value for stock.');
+
     const bookAlreadyExists = await this.bookRepository.findOne({ name });
     const setStock = stock ?? 1;
 

@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Book } from '@core/infrastructure/entities/books.entity';
 
 @Injectable()
-export class FindBooksListBookService
+export class FindBooksListService
   implements IFindAllService<Book, Promise<Book[]>>
 {
   constructor(private readonly bookRepository: BookRepository) {}

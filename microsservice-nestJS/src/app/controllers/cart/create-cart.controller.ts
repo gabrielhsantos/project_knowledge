@@ -3,7 +3,7 @@ import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { InternalServerErrorException } from '@shared/exceptions/internal-server-error.exception';
 import { IRequestHandler } from '@core/domain/interfaces/request-handler.interface';
 import { CartBodyDto, CartResponseDto } from '@core/domain/dtos/cart.dto';
-import { CartService } from '@services/cart/cart.service';
+import { CreateCartService } from '@services/cart/create-cart.service';
 import { cartResponse } from '@app/presenters/cart.mapper';
 import { NotFoundException } from '@shared/exceptions';
 import { UnprocessableEntityException } from '@shared/exceptions/unprocessable-entity.exception';
@@ -20,10 +20,10 @@ type handleResponse =
   name: 'authorization',
   description: 'Auth token',
 })
-export class CartController
+export class CreateCartController
   implements IRequestHandler<Promise<handleResponse>>
 {
-  constructor(private readonly cartService: CartService) {}
+  constructor(private readonly cartService: CreateCartService) {}
 
   @Post()
   @ApiOperation({ summary: 'Inserção de livros no carrinho de compras.' })

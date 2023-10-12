@@ -5,7 +5,7 @@ import { AppModule } from '@modules/app.module';
 import { TestModule } from '@modules/test/test.module';
 import { TestSetupService } from '../setupTests';
 
-describe('PlanController (e2e)', () => {
+describe('LoginController (e2e)', () => {
   let app: INestApplication;
   let testSetupService: TestSetupService;
 
@@ -24,20 +24,19 @@ describe('PlanController (e2e)', () => {
     await app.close();
   });
 
-  it('/POST /plans', async () => {
-    const newPlan = {
-      clientId: (await testSetupService.setupClient()).id,
-      productId: (await testSetupService.setupProduct()).id,
-      contribution: 2000.0,
-      subscriptionDate: '2023-04-05T12:00:00.000Z',
-      retirementAge: 60,
+  it('/POST /login', async () => {
+    await testSetupService.setupUser();
+
+    const userData = {
+      name: 'Thomas',
+      document: '45645645600',
     };
 
     const response = await request(app.getHttpServer())
-      .post(`/plans`)
-      .send(newPlan);
+      .post(`/login`)
+      .send(userData);
 
     expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty('id');
+    expect(response.body).toHaveProperty('token');
   });
 });

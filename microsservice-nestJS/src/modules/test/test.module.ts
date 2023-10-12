@@ -1,44 +1,46 @@
 import { Module } from '@nestjs/common';
 import { TestSetupService } from '../../../tests/setupTests';
-import { ProductService } from '@services/product.service';
-import { ClientService } from '@services/client.service';
-import { PlanService } from '@services/plan.service';
-import { RedemptionService } from '@services/redemption.service';
-import { ContributionService } from '@services/contribution.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Client } from '@core/infrastructure/entities/client.entity';
-import { Product } from '@core/infrastructure/entities/product.entity';
-import { Redemption } from '@core/infrastructure/entities/redemption.entity';
-import { Plan } from '@core/infrastructure/entities/plan.entity';
-import { Contribution } from '@core/infrastructure/entities/contribution.entity';
-import { ClientRepository } from '@core/infrastructure/repositories/client.repository';
-import { ProductRepository } from '@core/infrastructure/repositories/product.repository';
-import { PlanRepository } from '@core/infrastructure/repositories/plan.repository';
-import { RedemptionRepository } from '@core/infrastructure/repositories/redemption.repository';
-import { ContributionRepository } from '@core/infrastructure/repositories/contribution.repository';
+import { User } from '@core/infrastructure/entities/user.entity';
+import { Book } from '@core/infrastructure/entities/books.entity';
+import { Cart } from '@core/infrastructure/entities/cart.entity';
+import { CartBook } from '@core/infrastructure/entities/cart-book.entity';
+import { CreateBookService } from '@services/book/create-book.service';
+import { CreateCartService } from '@services/cart/create-cart.service';
+import { CreateUserService } from '@services/user/create-user.service';
+import { LoginService } from '@services/auth/login.service';
+import { UserRepository } from '@core/infrastructure/repositories/user.repository';
+import { BookRepository } from '@core/infrastructure/repositories/book.repository';
+import { CartRepository } from '@core/infrastructure/repositories/cart.repository';
+import { CartBookRepository } from '@core/infrastructure/repositories/cart-book.repository';
+import { BookFactory } from '@core/domain/factories/book.factory';
+import { CartFactory } from '@core/domain/factories/cart.factory';
+import { UserFactory } from '@core/domain/factories/user.factory';
+import { CartBookFactory } from '@core/domain/factories/car-book.factory';
+import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([
-      Client,
-      Product,
-      Plan,
-      Redemption,
-      Contribution,
-    ]),
-  ],
+  imports: [SequelizeModule.forFeature([User, Book, Cart, CartBook])],
   providers: [
     TestSetupService,
-    ClientService,
-    ClientRepository,
-    ProductService,
-    ProductRepository,
-    PlanService,
-    PlanRepository,
-    RedemptionService,
-    RedemptionRepository,
-    ContributionService,
-    ContributionRepository,
+
+    CreateBookService,
+    BookRepository,
+    BookFactory,
+
+    CreateCartService,
+    CartRepository,
+    CartFactory,
+
+    CreateUserService,
+    UserRepository,
+    UserFactory,
+
+    CartBookRepository,
+    CartBookFactory,
+
+    LoginService,
+    JwtService,
   ],
 })
 export class TestModule {}

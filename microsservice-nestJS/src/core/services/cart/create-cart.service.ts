@@ -16,7 +16,9 @@ import { Book } from '@core/infrastructure/entities/books.entity';
 import { CartBookDto } from '@core/domain/dtos/cart-book.dto';
 
 @Injectable()
-export class CartService implements ICreateService<CartBodyDto, Promise<Cart>> {
+export class CreateCartService
+  implements ICreateService<CartBodyDto, Promise<Cart>>
+{
   constructor(
     private readonly cartRepository: CartRepository,
     private readonly bookRepository: BookRepository,
@@ -59,7 +61,7 @@ export class CartService implements ICreateService<CartBodyDto, Promise<Cart>> {
     return newCart;
   }
 
-  async updateStock(
+  private async updateStock(
     cart: CartBodyDto,
     books: Book[],
   ): Promise<{ totalValue: number; cartBookList: Partial<CartBookDto>[] }> {
@@ -95,7 +97,7 @@ export class CartService implements ICreateService<CartBodyDto, Promise<Cart>> {
     return { totalValue, cartBookList };
   }
 
-  async createCartBookAssociations(
+  private async createCartBookAssociations(
     cartBookList: Partial<CartBookDto>[],
     cartId: number,
   ): Promise<void> {

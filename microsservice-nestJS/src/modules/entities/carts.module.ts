@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Cart } from '@core/infrastructure/entities/cart.entity';
-import { CartService } from '@services/cart/cart.service';
+import { CreateCartService } from '@services/cart/create-cart.service';
 import { CartRepository } from '@core/infrastructure/repositories/cart.repository';
 import { CartFactory } from '@core/domain/factories/cart.factory';
-import { CartController } from '@app/controllers/cart/create-cart.controller';
+import { CreateCartController } from '@app/controllers/cart/create-cart.controller';
 import { CartBook } from '@core/infrastructure/entities/cart-book.entity';
 import { Book } from '@core/infrastructure/entities/books.entity';
 import { BookRepository } from '@core/infrastructure/repositories/book.repository';
@@ -19,13 +19,13 @@ import { CartBookRepository } from '@core/infrastructure/repositories/cart-book.
   providers: [
     CartRepository,
     CartFactory,
-    CartService,
+    CreateCartService,
     BookRepository,
     BookFactory,
     UserRepository,
     CartBookFactory,
     CartBookRepository,
   ],
-  controllers: [CartController],
+  controllers: [CreateCartController],
 })
 export class CartModule {}
