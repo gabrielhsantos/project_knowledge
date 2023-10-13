@@ -1,16 +1,10 @@
 import { CreateBookController } from '@app/controllers/book/create-book.controller';
-import { CreateUserController } from '@app/controllers/user/create-user.controller';
 import { BookBodyDto } from '@core/domain/dtos/book.dto';
-import { UserBodyDto } from '@core/domain/dtos/user.dto';
 import { BookFactory } from '@core/domain/factories/book.factory';
-import { UserFactory } from '@core/domain/factories/user.factory';
 import { Book } from '@core/infrastructure/entities/books.entity';
-import { User } from '@core/infrastructure/entities/user.entity';
 import { BookRepository } from '@core/infrastructure/repositories/book.repository';
-import { UserRepository } from '@core/infrastructure/repositories/user.repository';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateBookService } from '@services/book/create-book.service';
-import { CreateUserService } from '@services/user/create-user.service';
 
 const bookEntity: Partial<Book> = {
   uuid: 'd69258e9-eeee-41b6-8414-95e654c7a4bb',
@@ -46,7 +40,7 @@ describe('CreateBookController', () => {
           },
         },
         {
-          provide: UserFactory,
+          provide: BookFactory,
           useValue: {
             create: jest.fn().mockResolvedValue(bookEntity),
           },
@@ -55,10 +49,10 @@ describe('CreateBookController', () => {
     }).compile();
 
     createBookController =
-      module.get<CreateUserController>(CreateUserController);
-    createBookService = module.get<CreateUserService>(CreateUserService);
-    bookRepository = module.get<UserRepository>(UserRepository);
-    bookFactory = module.get<UserFactory>(UserFactory);
+      module.get<CreateBookController>(CreateBookController);
+    createBookService = module.get<CreateBookService>(CreateBookService);
+    bookRepository = module.get<BookRepository>(BookRepository);
+    bookFactory = module.get<BookFactory>(BookFactory);
   });
 
   it('should be defined', () => {
@@ -69,7 +63,7 @@ describe('CreateBookController', () => {
   });
 
   describe('store', () => {
-    it('should create a user successfully', async () => {
+    it('should create a book successfully', async () => {
       const result = await createBookController.handle(body);
 
       expect(createBookService.create).toHaveBeenCalledWith(body);
