@@ -1,9 +1,9 @@
 # project_knowledge
 
-Este microsserviço foi desenvolvido como uma peça fundamental, destinada a ilustrar a essência da minha stack tecnológica e a forma como estruturo os meus códigos.
+Este microsserviço foi desenvolvido para ilustrar a essência da minha stack tecnológica e a forma como estruturo os meus códigos.
 Ele serve como um exemplo vivo do meu estilo de arquitetura, permitindo que eu apresente não apenas as tecnologias que escolhi,
 mas também a maneira como aplico as melhores práticas de desenvolvimento e organização em projetos de software.
-O Projeto encapsula as funcionalidades, assim como representa o cuidado e a atenção dedicados à concepção e à implementação de um projeto coeso e escalável.
+O projeto encapsula as funcionalidades, assim como representa o cuidado e a atenção dedicados à concepção e à implementação de um projeto coeso e escalável.
 
 ## 🚀 Começando
 
